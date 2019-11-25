@@ -45,7 +45,6 @@ REDMINE_PLUGIN_DIR=$( find ${REDMINE_DIR}/plugins -mindepth 1 -maxdepth 1 -type 
 # プラグインアップデート
 for PLUGIN in ${REDMINE_PLUGIN_DIR}
 do
-echo ${PLUGIN}
   PLUGIN_NAME=$( awk -F'/' '{print $NF}' <<< ${PLUGIN} )
   # ブランチ名取得
   if [ -z "${BRANCHES[${PLUGIN_NAME}]}" ];then
@@ -79,7 +78,6 @@ REDMINE_THEME_DIR=$( find ${REDMINE_DIR}/public/themes -mindepth 1 -maxdepth 1 -
 # テーマアップデート
 for THEME in ${REDMINE_THEME_DIR}
 do
-echo ${THEME}
   if [ -d "${THEME}/.git" ]; then
     sudo su -s {{ shell }} - ${REDMINE_OWNER} -c "cd ${THEME}; ${GIT_BIN} pull"
   fi

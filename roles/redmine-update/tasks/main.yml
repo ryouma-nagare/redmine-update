@@ -29,7 +29,18 @@
 
 - name: execute shell script
   shell: /tmp/redmine-{{ inventory_hostname }}/upd_redmine.sh
+  register: out_from_shell
   notify: restart service
+
+- name: output stdout
+  debug:
+    var: out_from_shell.stdout_lines
+  when: debug_stdout
+
+- name: output stderr
+  debug:
+    var: out_from_shell.stderr_lines
+  when: debug_stderr
 
 - name: delete workdir
   file:

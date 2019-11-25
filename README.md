@@ -51,6 +51,11 @@ LinuxにインストールしたRedmineの本体／プラグイン／テーマ�
 #### 再起動するサービス名
 - `services`:シェルスクリプト実行後に`systemctl restart`するサービス名のリスト
 
+#### シェル実行結果の表示フラグ
+- `debug_stdout`: 標準出力を表示する場合は`true`
+- `debug_stderr`: 標準エラー出力を表示する場合は`true`
+
+
 ## 実行方法
 
 ```
