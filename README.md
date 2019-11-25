@@ -17,11 +17,11 @@ LinuxにインストールしたRedmineの本体／プラグイン／テーマ�
 
 ### ホスト設定
 - `inventory/hosts`
- - `ホスト名`：任意の名前（ラベル）
- - `ansible_host`：FQDN または IP
- - `ansible_user`：SSHでログインするユーザ名
- - `ansible_password`：パスワード
- - `ansible_private_key_file`：鍵ファイル名
+  - `ホスト名`：任意の名前（ラベル）
+  - `ansible_host`：FQDN または IP
+  - `ansible_user`：SSHでログインするユーザ名
+  - `ansible_password`：パスワード
+  - `ansible_private_key_file`：鍵ファイル名
 
 ※ansible_password/ansible_private_key_file はいずれかを指定
 
