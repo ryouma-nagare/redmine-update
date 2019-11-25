@@ -1,0 +1,86 @@
+#!{{ shell }}
+
+####################################
+# 環境依存値
+####################################
+# Railsディレクトリ
+REDMINE_DIR={{ redmine_dir }}
+
+# Railsディレクトリオーナ
+REDMINE_OWNER={{ redmine_owner }}
+# コマンド
+BUNDLE_BIN={{ bundle_bin }}
+SVN_BIN={{ svn_bin }}
+GIT_BIN={{ git_bin }}
+# プラグインブランチ指定ファイル
+BRANCH_FILE=/tmp/redmine-{{ inventory_hostname }}/branches.txt
+
+####################################
+# 本体アップデート
+####################################
+if [ -d "${REDMINE_DIR}/.svn" ]; then
+  # For Redmine
+  sudo su -s {{ shell }} - ${REDMINE_OWNER} -c "cd ${REDMINE_DIR}; ${SVN_BIN} up"
+elif [ -d "${REDMINE_DIR}/.git" ]; then
+  # For RedMica
+  sudo su -s {{ shell }} - ${REDMINE_OWNER} -c "cd ${REDMINE_DIR}; ${GIT_BIN} pull"
+fi
+
+####################################
+# プラグインアップデート
+####################################
+# ブランチ指定ファイル読み込み
+declare -A BRANCHES
+while read line
+do
+  read PLUGIN_NAME BRANCH_NAME <<< $( awk '{print $1, $2}' <<< "${line}" )
+  if [ -n "${PLUGIN_NAME}" -a -n "${BRANCH_NAME}" ]; then
+    BRANCHES["${PLUGIN_NAME}"]="${BRANCH_NAME}"
+  fi
+done < ${BRANCH_FILE}
+
+# プラグインディレクトリ検索
+REDMINE_PLUGIN_DIR=$( find ${REDMINE_DIR}/plugins -mindepth 1 -maxdepth 1 -type d )
+
+# プラグインアップデート
+for PLUGIN in ${REDMINE_PLUGIN_DIR}
+do
+echo ${PLUGIN}
+  PLUGIN_NAME=$( awk -F'/' '{print $NF}' <<< ${PLUGIN} )
+  # ブランチ名取得
+  if [ -z "${BRANCHES[${PLUGIN_NAME}]}" ];then
+    BRANCH_GIT="master"
+  else
+    BRANCH_GIT=${BRANCHES[${PLUGIN_NAME}]}
+  fi
+
+  if [ -d "${PLUGIN}/.git" ]; then
+    sudo su -s {{ shell }} - ${REDMINE_OWNER} -c "cd ${PLUGIN}; ${GIT_BIN} fetch ; ${GIT_BIN} checkout ${BRANCH_GIT}; ${GIT_BIN} pull"
+  fi
+done
+
+####################################
+# gemアップデート
+####################################
+sudo su -s {{ shell }} - ${REDMINE_OWNER} -c "cd ${REDMINE_DIR}; ${BUNDLE_BIN} update"
+sudo su -s {{ shell }} - ${REDMINE_OWNER} -c "cd ${REDMINE_DIR}; ${BUNDLE_BIN} install --without development test ; ${BUNDLE_BIN} clean"
+
+####################################
+# DBマイグレーション
+####################################
+sudo su -s {{ shell }} - ${REDMINE_OWNER} -c "cd ${REDMINE_DIR}; RAILS_ENV=production ${BUNDLE_BIN} exec rake db:migrate"
+sudo su -s {{ shell }} - ${REDMINE_OWNER} -c "cd ${REDMINE_DIR}; RAILS_ENV=production ${BUNDLE_BIN} exec rake redmine:plugins:migrate"
+
+####################################
+# テーマアップデート
+####################################
+# テーマディレクトリ検索
+REDMINE_THEME_DIR=$( find ${REDMINE_DIR}/public/themes -mindepth 1 -maxdepth 1 -type d )
+# テーマアップデート
+for THEME in ${REDMINE_THEME_DIR}
+do
+echo ${THEME}
+  if [ -d "${THEME}/.git" ]; then
+    sudo su -s {{ shell }} - ${REDMINE_OWNER} -c "cd ${THEME}; ${GIT_BIN} pull"
+  fi
+done

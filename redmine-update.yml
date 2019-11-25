@@ -1,0 +1,6 @@
+#
+# redmine-update
+#
+- hosts: all
+  roles:
+    - redmine-update
