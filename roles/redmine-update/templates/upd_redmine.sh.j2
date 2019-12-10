@@ -20,7 +20,7 @@ BRANCH_FILE=/tmp/redmine-{{ inventory_hostname }}/branches.txt
 ####################################
 if [ -d "${REDMINE_DIR}/.svn" ]; then
   # For Redmine
-  sudo su -s {{ shell }} - ${REDMINE_OWNER} -c "cd ${REDMINE_DIR}; ${SVN_BIN} up"
+  sudo su -s {{ shell }} - ${REDMINE_OWNER} -c "cd ${REDMINE_DIR}; ${SVN_BIN} up --trust-server-cert"
 elif [ -d "${REDMINE_DIR}/.git" ]; then
   # For RedMica
   sudo su -s {{ shell }} - ${REDMINE_OWNER} -c "cd ${REDMINE_DIR}; ${GIT_BIN} pull"
