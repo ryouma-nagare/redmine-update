@@ -7,20 +7,6 @@
     state: directory
     mode: 0755
 
-- name: upload branches.txt
-  template:
-    src: "branches.txt.j2"
-    dest: "/tmp/redmine-{{ inventory_hostname }}/branches.txt"
-    mode: 0644
-  when: plugins is defined
-
-- name: create branches.txt
-  file:
-    path: "/tmp/redmine-{{ inventory_hostname }}/branches.txt"
-    state: file
-    mode: 0644
-  when: plugins is not defined
-
 - name: upload shell script
   template:
     src: "upd_redmine.sh.j2"

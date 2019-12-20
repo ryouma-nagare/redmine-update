@@ -12,8 +12,12 @@ REDMINE_OWNER={{ redmine_owner }}
 BUNDLE_BIN={{ bundle_bin }}
 SVN_BIN={{ svn_bin }}
 GIT_BIN={{ git_bin }}
-# プラグインブランチ指定ファイル
-BRANCH_FILE=/tmp/redmine-{{ inventory_hostname }}/branches.txt
+
+# ブランチ指定
+declare -A BRANCHES
+{% for item in plugins %}
+BRANCHES["{{ plugins[item].plugin_name }}"]="{{ plugins[item].branch_name }}"
+{% endfor %}
 
 ####################################
 # 本体アップデート
@@ -29,16 +33,6 @@ fi
 ####################################
 # プラグインアップデート
 ####################################
-# ブランチ指定ファイル読み込み
-declare -A BRANCHES
-while read line
-do
-  read PLUGIN_NAME BRANCH_NAME <<< $( awk '{print $1, $2}' <<< "${line}" )
-  if [ -n "${PLUGIN_NAME}" -a -n "${BRANCH_NAME}" ]; then
-    BRANCHES["${PLUGIN_NAME}"]="${BRANCH_NAME}"
-  fi
-done < ${BRANCH_FILE}
-
 # プラグインディレクトリ検索
 REDMINE_PLUGIN_DIR=$( find ${REDMINE_DIR}/plugins -mindepth 1 -maxdepth 1 -type d )
 
