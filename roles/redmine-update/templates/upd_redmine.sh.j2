@@ -55,7 +55,7 @@ done
 ####################################
 # gemアップデート
 ####################################
-sudo su -s {{ shell }} - ${REDMINE_OWNER} -c "cd ${REDMINE_DIR}; ${BUNDLE_BIN} update"
+sudo su -s {{ shell }} - ${REDMINE_OWNER} -c "cd ${REDMINE_DIR}; rm -f Gemfile.lock; ${BUNDLE_BIN} update"
 sudo su -s {{ shell }} - ${REDMINE_OWNER} -c "cd ${REDMINE_DIR}; ${BUNDLE_BIN} install --without development test ; ${BUNDLE_BIN} clean"
 
 ####################################
