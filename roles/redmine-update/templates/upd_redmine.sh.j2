@@ -15,9 +15,11 @@ GIT_BIN={{ git_bin }}
 
 # ブランチ指定
 declare -A BRANCHES
+{% if plugins is defined %}
 {% for item in plugins %}
 BRANCHES["{{ plugins[item].plugin_name }}"]="{{ plugins[item].branch_name }}"
 {% endfor %}
+{% endif %}
 
 ####################################
 # 本体アップデート
